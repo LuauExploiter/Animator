@@ -1,10 +1,13 @@
-local Root = script.Parent.Parent
-local AnimationAsset = require(Root:WaitForChild("assets"):WaitForChild("animations"):WaitForChild("death"))
+local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+
 local Shared = script.Parent:WaitForChild("Shared")
 local EmotesFolder = script.Parent:WaitForChild("Emotes")
 local DeathFolder = EmotesFolder:WaitForChild("Death")
 
-local Animator = require(Shared:WaitForChild("Animator"):WaitForChild("Source"):WaitForChild("Animator"))
+local AnimatorSource = Shared:WaitForChild("Animator"):WaitForChild("Source")
+local AnimatorModule = AnimatorSource:FindFirstChild("Animator") or AnimatorSource:FindFirstChild("Main")
+local Animator = require(AnimatorModule)
 
 local Runtime = Shared:WaitForChild("Runtime")
 local CharacterRuntime = require(Runtime:WaitForChild("Character"))
@@ -24,7 +27,15 @@ local Assets = require(DeathFolder:WaitForChild("Assets"))
 
 local Adapter = require(script.Parent:WaitForChild("GameAdapters"):WaitForChild("Universal"))
 
+local Root = script.Parent.Parent
+local assetsFolder = Root:FindFirstChild("assets")
+local animationsFolder = assetsFolder and assetsFolder:FindFirstChild("animations")
+local deathAnimationModule = animationsFolder and animationsFolder:FindFirstChild("death")
+local AnimationAsset = deathAnimationModule and require(deathAnimationModule) or nil
+
 local Loader = {}
+
+local persistentGui = GuiRuntime.new()
 
 local cachedBadWolf
 local cachedBadWolfAttempted = false
@@ -39,108 +50,147 @@ local cachedEmotes
 local cachedEmotesAttempted = false
 
 local function resolveBadWolfModule()
-	local root = script.Parent.Parent
-	local assetsFolder = root:FindFirstChild("assets")
-	if not assetsFolder then
-		return nil
-	end
-
-	local vfxFolder = assetsFolder:FindFirstChild("vfx")
-	if not vfxFolder then
-		return nil
-	end
-
-	local deathAssetsFolder = vfxFolder:FindFirstChild("death")
-	if not deathAssetsFolder then
-		return nil
-	end
-
-	return deathAssetsFolder:FindFirstChild("BadWolf")
+	local assets = Root:FindFirstChild("assets")
+	local vfxFolder = assets and assets:FindFirstChild("vfx")
+	local deathFolder = vfxFolder and vfxFolder:FindFirstChild("death")
+	return deathFolder and deathFolder:FindFirstChild("BadWolf")
 end
 
 local function resolveGuiModule(name)
-	local root = script.Parent.Parent
-	local assetsFolder = root:FindFirstChild("assets")
-	if not assetsFolder then
-		return nil
-	end
-
-	local guiFolder = assetsFolder:FindFirstChild("gui")
-	if not guiFolder then
-		return nil
-	end
-
-	return guiFolder:FindFirstChild(name)
+	local assets = Root:FindFirstChild("assets")
+	local guiFolder = assets and assets:FindFirstChild("gui")
+	return guiFolder and guiFolder:FindFirstChild(name)
 end
 
-local function preloadBadWolf()
-	if cachedBadWolfAttempted then
-		return
+local function requireDetachedBadWolf(moduleScript)
+	if not moduleScript then
+		return nil
 	end
 
-	cachedBadWolfAttempted = true
+	local emotesFolder = ReplicatedStorage:FindFirstChild("Emotes")
+	local createdCompat = false
 
-	local badWolfModule = resolveBadWolfModule()
-	if badWolfModule then
-		local ok, result = pcall(require, badWolfModule)
-		if ok then
-			cachedBadWolf = result
+	if not emotesFolder then
+		emotesFolder = Instance.new("Folder")
+		emotesFolder.Name = "Emotes"
+		emotesFolder.Parent = ReplicatedStorage
+		createdCompat = true
+	end
+
+	local ok, result = pcall(require, moduleScript)
+	local detached = nil
+
+	if ok then
+		if typeof(result) == "Instance" then
+			detached = result:Clone()
 		else
-			warn("[Death] BadWolf preload failed:", result)
+			detached = result
 		end
+	else
+		warn("[Death] BadWolf preload failed:", result)
 	end
+
+	if createdCompat and emotesFolder and emotesFolder.Parent then
+		pcall(function()
+			emotesFolder:Destroy()
+		end)
+	end
+
+	return detached
 end
 
-local function preloadGui()
+local function requireAssetModule(moduleScript, label)
+	if not moduleScript then
+		return nil
+	end
+
+	local ok, result = pcall(require, moduleScript)
+	if ok then
+		return result
+	end
+
+	warn("[Death] " .. tostring(label) .. " preload failed:", result)
+	return nil
+end
+
+local function preloadAssets()
+	if not cachedBadWolfAttempted then
+		cachedBadWolfAttempted = true
+		cachedBadWolf = requireDetachedBadWolf(resolveBadWolfModule())
+	end
+
 	if not cachedHotbarAttempted then
 		cachedHotbarAttempted = true
-		local moduleScript = resolveGuiModule("Hotbar")
-		if moduleScript then
-			local ok, result = pcall(require, moduleScript)
-			if ok then
-				cachedHotbar = result
-			else
-				warn("[Death] Hotbar preload failed:", result)
-			end
-		end
+		cachedHotbar = requireAssetModule(resolveGuiModule("Hotbar"), "Hotbar")
 	end
 
 	if not cachedBarAttempted then
 		cachedBarAttempted = true
-		local moduleScript = resolveGuiModule("Bar")
-		if moduleScript then
-			local ok, result = pcall(require, moduleScript)
-			if ok then
-				cachedBar = result
-			else
-				warn("[Death] Bar preload failed:", result)
-			end
-		end
+		cachedBar = requireAssetModule(resolveGuiModule("Bar"), "Bar")
 	end
 
 	if not cachedEmotesAttempted then
 		cachedEmotesAttempted = true
-		local moduleScript = resolveGuiModule("Emotes")
-		if moduleScript then
-			local ok, result = pcall(require, moduleScript)
-			if ok then
-				cachedEmotes = result
-			else
-				warn("[Death] Emotes preload failed:", result)
-			end
-		end
+		cachedEmotes = requireAssetModule(resolveGuiModule("Emotes"), "Emotes")
 	end
 end
 
-preloadBadWolf()
-preloadGui()
+local function buildAnimationResolvable()
+	local merged = {}
+
+	if type(AnimationData) == "table" then
+		for k, v in pairs(AnimationData) do
+			merged[k] = v
+		end
+	end
+
+	if type(AnimationAsset) == "table" then
+		for k, v in pairs(AnimationAsset) do
+			merged[k] = v
+		end
+	end
+
+	if next(merged) then
+		return merged
+	end
+
+	return {
+		Id = AnimationData.Id or AnimationData.AnimationId,
+		Markers = AnimationData.Markers,
+		Looped = AnimationData.Looped or Manifest.Looped,
+	}
+end
+
+local function triggerDeath()
+	if getgenv and getgenv().DeathStart then
+		getgenv().DeathStart()
+		return
+	end
+
+	local localPlayer = Players.LocalPlayer
+	if localPlayer and localPlayer.Character then
+		pcall(function()
+			Loader.play(localPlayer.Character)
+		end)
+	end
+end
+
+local function ensureUI()
+	preloadAssets()
+
+	persistentGui:addHotbar(cachedHotbar, triggerDeath)
+	persistentGui:addBar(cachedBar)
+	local emotesGui = persistentGui:addEmotes(cachedEmotes, triggerDeath)
+	persistentGui:addTopIcon(emotesGui)
+end
 
 function Loader.play(character)
+	ensureUI()
+
 	local context = CharacterRuntime.new(character)
 	local sounds = SoundRuntime.new()
 	local vfx = VFXRuntime.new(context)
 	local camera = CameraRuntime.new(context)
-	local gui = GuiRuntime.new(context)
 
 	local session = {
 		Playing = true,
@@ -149,16 +199,8 @@ function Loader.play(character)
 		Sounds = sounds,
 		VFX = vfx,
 		Camera = camera,
-		Gui = gui,
 		Animator = nil,
 	}
-
-	local function triggerDeath()
-		if getgenv and getgenv().DeathStart then
-			getgenv().DeathStart()
-			return
-		end
-	end
 
 	function session:Stop(reason)
 		if not self.Playing then
@@ -177,13 +219,9 @@ function Loader.play(character)
 	context:setupForManifest(Manifest)
 	context:lockWalkSpeed(Manifest.WalkSpeed or 5.333333492279053)
 
-	local animator = Animator.new(character, {
-		Id = AnimationData.Id or AnimationData.AnimationId,
-		Markers = AnimationData.Markers or {},
-		Looped = AnimationData.Looped or Manifest.Looped,
-	})
-
-	animator.Looped = AnimationData.Looped or Manifest.Looped
+	local animationResolvable = buildAnimationResolvable()
+	local animator = Animator.new(character, animationResolvable)
+	animator.Looped = animationResolvable.Looped or animationResolvable.Loop or Manifest.Looped
 	session.Animator = animator
 
 	if cachedBadWolf then
@@ -197,29 +235,6 @@ function Loader.play(character)
 			warn("[Death] BadWolf runtime load failed:", err)
 		end
 	end
-
-	if cachedHotbar then
-		pcall(function()
-			gui:addHotbar(cachedHotbar, triggerDeath)
-		end)
-	end
-
-	if cachedBar then
-		pcall(function()
-			gui:addBar(cachedBar)
-		end)
-	end
-
-	local emotesGui
-	if cachedEmotes then
-		pcall(function()
-			emotesGui = gui:addEmotes(cachedEmotes, triggerDeath)
-		end)
-	end
-
-	pcall(function()
-		gui:addTopIcon(emotesGui)
-	end)
 
 	camera:bindMarkers(animator, CameraData)
 
