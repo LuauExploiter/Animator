@@ -45,10 +45,12 @@ local function beginJumpSuppress(context)
 
 	local threadObj = task.spawn(function()
 		root.Anchored = true
+
 		for _ = 1, 2 do
 			if not root.Parent then
 				break
 			end
+
 			humanoid.Jump = false
 			pcall(function()
 				humanoid:ChangeState(Enum.HumanoidStateType.Running)
@@ -56,6 +58,7 @@ local function beginJumpSuppress(context)
 
 			local pos = root.Position
 			local vel = root.AssemblyLinearVelocity
+
 			root.AssemblyLinearVelocity = Vector3.new(vel.X, 0, vel.Z)
 			root.CFrame = CFrame.new(pos.X, startPos.Y, pos.Z) * (root.CFrame - root.Position)
 
