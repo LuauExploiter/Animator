@@ -2059,9 +2059,9 @@ set(objects[37], "numExpectedDirectChildren", 0)
 
 set(objects[38], "Name", "ParticleEmitter")
 set(objects[38], "Acceleration", Vector3.new())
-set(objects[38], "Attributes", "\000\000\000    \000\000\000EmitCount\000\000\000\000\000\000ð?")
-set(objects[38], "AttributesReplicate", "\000\000\000    \000\000\000EmitCount\000\000\000\000\000\000ð?")
-set(objects[38], "AttributesSerialize", "\000\000\000    \000\000\000EmitCount\000\000\000\000\000\000ð?")
+set(objects[38], "Attributes", "\000\000\000    \000\000\000EmitCount\000\000\000\000\000\000Ã°?")
+set(objects[38], "AttributesReplicate", "\000\000\000    \000\000\000EmitCount\000\000\000\000\000\000Ã°?")
+set(objects[38], "AttributesSerialize", "\000\000\000    \000\000\000EmitCount\000\000\000\000\000\000Ã°?")
 set(objects[38], "Brightness", 1000)
 set(objects[38], "Color", ColorSequence.new(Color3.fromRGB(255, 69, 44)))
 set(objects[38], "DefinesCapabilities", false)
@@ -2115,9 +2115,9 @@ setAttr(objects[38], "EmitCount", 1)
 
 set(objects[39], "Name", "ParticleEmitter")
 set(objects[39], "Acceleration", Vector3.new())
-set(objects[39], "Attributes", "\000\000\000    \000\000\000EmitCount\000\000\000\000\000\000ð?")
-set(objects[39], "AttributesReplicate", "\000\000\000    \000\000\000EmitCount\000\000\000\000\000\000ð?")
-set(objects[39], "AttributesSerialize", "\000\000\000    \000\000\000EmitCount\000\000\000\000\000\000ð?")
+set(objects[39], "Attributes", "\000\000\000    \000\000\000EmitCount\000\000\000\000\000\000Ã°?")
+set(objects[39], "AttributesReplicate", "\000\000\000    \000\000\000EmitCount\000\000\000\000\000\000Ã°?")
+set(objects[39], "AttributesSerialize", "\000\000\000    \000\000\000EmitCount\000\000\000\000\000\000Ã°?")
 set(objects[39], "Brightness", 25)
 set(objects[39], "Color", ColorSequence.new(Color3.fromRGB(255, 134, 73)))
 set(objects[39], "DefinesCapabilities", false)
@@ -2184,9 +2184,9 @@ setAttr(objects[39], "EmitCount", 1)
 
 set(objects[40], "Name", "ParticleEmitter")
 set(objects[40], "Acceleration", Vector3.new())
-set(objects[40], "Attributes", "\000\000\000    \000\000\000EmitCount\000\000\000\000\000\000ð?")
-set(objects[40], "AttributesReplicate", "\000\000\000    \000\000\000EmitCount\000\000\000\000\000\000ð?")
-set(objects[40], "AttributesSerialize", "\000\000\000    \000\000\000EmitCount\000\000\000\000\000\000ð?")
+set(objects[40], "Attributes", "\000\000\000    \000\000\000EmitCount\000\000\000\000\000\000Ã°?")
+set(objects[40], "AttributesReplicate", "\000\000\000    \000\000\000EmitCount\000\000\000\000\000\000Ã°?")
+set(objects[40], "AttributesSerialize", "\000\000\000    \000\000\000EmitCount\000\000\000\000\000\000Ã°?")
 set(objects[40], "Brightness", 4)
 set(objects[40], "Color", ColorSequence.new(Color3.fromRGB(255, 128, 64)))
 set(objects[40], "DefinesCapabilities", false)
@@ -2364,9 +2364,9 @@ setAttr(objects[42], "EmitCount", 12)
 
 set(objects[43], "Name", "ParticleEmitter")
 set(objects[43], "Acceleration", Vector3.new())
-set(objects[43], "Attributes", "\000\000\000    \000\000\000EmitCount\000\000\000\000\000\000ð?")
-set(objects[43], "AttributesReplicate", "\000\000\000    \000\000\000EmitCount\000\000\000\000\000\000ð?")
-set(objects[43], "AttributesSerialize", "\000\000\000    \000\000\000EmitCount\000\000\000\000\000\000ð?")
+set(objects[43], "Attributes", "\000\000\000    \000\000\000EmitCount\000\000\000\000\000\000Ã°?")
+set(objects[43], "AttributesReplicate", "\000\000\000    \000\000\000EmitCount\000\000\000\000\000\000Ã°?")
+set(objects[43], "AttributesSerialize", "\000\000\000    \000\000\000EmitCount\000\000\000\000\000\000Ã°?")
 set(objects[43], "Brightness", 3)
 set(objects[43], "Color", ColorSequence.new(Color3.new(1, 0.47235775, 0.29789531)))
 set(objects[43], "DefinesCapabilities", false)
@@ -2506,9 +2506,9 @@ setAttr(objects[44], "EmitCount", 3)
 
 set(objects[45], "Name", "ParticleEmitter")
 set(objects[45], "Acceleration", Vector3.new())
-set(objects[45], "Attributes", "\000\000\000    \000\000\000EmitCount\000\000\000\000\000\000ð?")
-set(objects[45], "AttributesReplicate", "\000\000\000    \000\000\000EmitCount\000\000\000\000\000\000ð?")
-set(objects[45], "AttributesSerialize", "\000\000\000    \000\000\000EmitCount\000\000\000\000\000\000ð?")
+set(objects[45], "Attributes", "\000\000\000    \000\000\000EmitCount\000\000\000\000\000\000Ã°?")
+set(objects[45], "AttributesReplicate", "\000\000\000    \000\000\000EmitCount\000\000\000\000\000\000Ã°?")
+set(objects[45], "AttributesSerialize", "\000\000\000    \000\000\000EmitCount\000\000\000\000\000\000Ã°?")
 set(objects[45], "Brightness", 3)
 set(objects[45], "Color", ColorSequence.new(Color3.fromRGB(255, 122, 70)))
 set(objects[45], "DefinesCapabilities", false)
@@ -2577,9 +2577,9 @@ setAttr(objects[45], "EmitCount", 1)
 
 set(objects[46], "Name", "ParticleEmitter")
 set(objects[46], "Acceleration", Vector3.new())
-set(objects[46], "Attributes", "\000\000\000    \000\000\000EmitCount\000\000\000\000\000\000ð?")
-set(objects[46], "AttributesReplicate", "\000\000\000    \000\000\000EmitCount\000\000\000\000\000\000ð?")
-set(objects[46], "AttributesSerialize", "\000\000\000    \000\000\000EmitCount\000\000\000\000\000\000ð?")
+set(objects[46], "Attributes", "\000\000\000    \000\000\000EmitCount\000\000\000\000\000\000Ã°?")
+set(objects[46], "AttributesReplicate", "\000\000\000    \000\000\000EmitCount\000\000\000\000\000\000Ã°?")
+set(objects[46], "AttributesSerialize", "\000\000\000    \000\000\000EmitCount\000\000\000\000\000\000Ã°?")
 set(objects[46], "Brightness", 3)
 set(objects[46], "Color", ColorSequence.new(Color3.fromRGB(255, 125, 74)))
 set(objects[46], "DefinesCapabilities", false)
@@ -2764,9 +2764,9 @@ setAttr(objects[48], "EmitCount", 2)
 
 set(objects[49], "Name", "ParticleEmitter")
 set(objects[49], "Acceleration", Vector3.new())
-set(objects[49], "Attributes", "\000\000\000    \000\000\000EmitCount\000\000\000\000\000\000ð?")
-set(objects[49], "AttributesReplicate", "\000\000\000    \000\000\000EmitCount\000\000\000\000\000\000ð?")
-set(objects[49], "AttributesSerialize", "\000\000\000    \000\000\000EmitCount\000\000\000\000\000\000ð?")
+set(objects[49], "Attributes", "\000\000\000    \000\000\000EmitCount\000\000\000\000\000\000Ã°?")
+set(objects[49], "AttributesReplicate", "\000\000\000    \000\000\000EmitCount\000\000\000\000\000\000Ã°?")
+set(objects[49], "AttributesSerialize", "\000\000\000    \000\000\000EmitCount\000\000\000\000\000\000Ã°?")
 set(objects[49], "Brightness", 13)
 set(objects[49], "Color", ColorSequence.new(Color3.fromRGB(255, 119, 73)))
 set(objects[49], "DefinesCapabilities", false)
@@ -3559,9 +3559,9 @@ set(objects[62], "numExpectedDirectChildren", 0)
 
 set(objects[63], "Name", "ParticleEmitter")
 set(objects[63], "Acceleration", Vector3.new())
-set(objects[63], "Attributes", "\000\000\000\000\000\000EmitDuration333333û?")
-set(objects[63], "AttributesReplicate", "\000\000\000\000\000\000EmitDuration333333û?")
-set(objects[63], "AttributesSerialize", "\000\000\000\000\000\000EmitDuration333333û?")
+set(objects[63], "Attributes", "\000\000\000\000\000\000EmitDuration333333Ã»?")
+set(objects[63], "AttributesReplicate", "\000\000\000\000\000\000EmitDuration333333Ã»?")
+set(objects[63], "AttributesSerialize", "\000\000\000\000\000\000EmitDuration333333Ã»?")
 set(objects[63], "Brightness", 2)
 set(objects[63], "Color", ColorSequence.new(Color3.fromRGB(255, 255, 255)))
 set(objects[63], "DefinesCapabilities", false)
@@ -3629,9 +3629,9 @@ setAttr(objects[63], "EmitDuration", 1.7)
 
 set(objects[64], "Name", "ParticleEmitter")
 set(objects[64], "Acceleration", Vector3.new())
-set(objects[64], "Attributes", "\000\000\000\000\000\000EmitDuration333333û?")
-set(objects[64], "AttributesReplicate", "\000\000\000\000\000\000EmitDuration333333û?")
-set(objects[64], "AttributesSerialize", "\000\000\000\000\000\000EmitDuration333333û?")
+set(objects[64], "Attributes", "\000\000\000\000\000\000EmitDuration333333Ã»?")
+set(objects[64], "AttributesReplicate", "\000\000\000\000\000\000EmitDuration333333Ã»?")
+set(objects[64], "AttributesSerialize", "\000\000\000\000\000\000EmitDuration333333Ã»?")
 set(objects[64], "Brightness", 1)
 set(objects[64], "Color", ColorSequence.new(Color3.fromRGB(255, 255, 255)))
 set(objects[64], "DefinesCapabilities", false)
@@ -3686,9 +3686,9 @@ setAttr(objects[64], "EmitDuration", 1.7)
 
 set(objects[65], "Name", "ParticleEmitter")
 set(objects[65], "Acceleration", Vector3.new())
-set(objects[65], "Attributes", "\000\000\000\000\000\000EmitDuration333333û?")
-set(objects[65], "AttributesReplicate", "\000\000\000\000\000\000EmitDuration333333û?")
-set(objects[65], "AttributesSerialize", "\000\000\000\000\000\000EmitDuration333333û?")
+set(objects[65], "Attributes", "\000\000\000\000\000\000EmitDuration333333Ã»?")
+set(objects[65], "AttributesReplicate", "\000\000\000\000\000\000EmitDuration333333Ã»?")
+set(objects[65], "AttributesSerialize", "\000\000\000\000\000\000EmitDuration333333Ã»?")
 set(objects[65], "Brightness", 7)
 set(objects[65], "Color", ColorSequence.new(Color3.fromRGB(255, 255, 255)))
 set(objects[65], "DefinesCapabilities", false)
@@ -3742,9 +3742,9 @@ setAttr(objects[65], "EmitDuration", 1.7)
 
 set(objects[66], "Name", "ParticleEmitter")
 set(objects[66], "Acceleration", Vector3.new())
-set(objects[66], "Attributes", "\000\000\000\000\000\000EmitDuration333333û?")
-set(objects[66], "AttributesReplicate", "\000\000\000\000\000\000EmitDuration333333û?")
-set(objects[66], "AttributesSerialize", "\000\000\000\000\000\000EmitDuration333333û?")
+set(objects[66], "Attributes", "\000\000\000\000\000\000EmitDuration333333Ã»?")
+set(objects[66], "AttributesReplicate", "\000\000\000\000\000\000EmitDuration333333Ã»?")
+set(objects[66], "AttributesSerialize", "\000\000\000\000\000\000EmitDuration333333Ã»?")
 set(objects[66], "Brightness", 0.1)
 set(objects[66], "Color", ColorSequence.new(Color3.fromRGB(255, 255, 255)))
 set(objects[66], "DefinesCapabilities", false)
@@ -3949,9 +3949,9 @@ set(objects[69], "numExpectedDirectChildren", 0)
 
 set(objects[70], "Name", "ParticleEmitter")
 set(objects[70], "Acceleration", Vector3.new())
-set(objects[70], "Attributes", "\000\000\000\000\000\000EmitDuration333333û?")
-set(objects[70], "AttributesReplicate", "\000\000\000\000\000\000EmitDuration333333û?")
-set(objects[70], "AttributesSerialize", "\000\000\000\000\000\000EmitDuration333333û?")
+set(objects[70], "Attributes", "\000\000\000\000\000\000EmitDuration333333Ã»?")
+set(objects[70], "AttributesReplicate", "\000\000\000\000\000\000EmitDuration333333Ã»?")
+set(objects[70], "AttributesSerialize", "\000\000\000\000\000\000EmitDuration333333Ã»?")
 set(objects[70], "Brightness", 2)
 set(objects[70], "Color", ColorSequence.new(Color3.fromRGB(255, 255, 255)))
 set(objects[70], "DefinesCapabilities", false)
@@ -4019,9 +4019,9 @@ setAttr(objects[70], "EmitDuration", 1.7)
 
 set(objects[71], "Name", "ParticleEmitter")
 set(objects[71], "Acceleration", Vector3.new())
-set(objects[71], "Attributes", "\000\000\000\000\000\000EmitDuration333333û?")
-set(objects[71], "AttributesReplicate", "\000\000\000\000\000\000EmitDuration333333û?")
-set(objects[71], "AttributesSerialize", "\000\000\000\000\000\000EmitDuration333333û?")
+set(objects[71], "Attributes", "\000\000\000\000\000\000EmitDuration333333Ã»?")
+set(objects[71], "AttributesReplicate", "\000\000\000\000\000\000EmitDuration333333Ã»?")
+set(objects[71], "AttributesSerialize", "\000\000\000\000\000\000EmitDuration333333Ã»?")
 set(objects[71], "Brightness", 1)
 set(objects[71], "Color", ColorSequence.new(Color3.fromRGB(255, 255, 255)))
 set(objects[71], "DefinesCapabilities", false)
@@ -4076,9 +4076,9 @@ setAttr(objects[71], "EmitDuration", 1.7)
 
 set(objects[72], "Name", "ParticleEmitter")
 set(objects[72], "Acceleration", Vector3.new())
-set(objects[72], "Attributes", "\000\000\000\000\000\000EmitDuration333333û?")
-set(objects[72], "AttributesReplicate", "\000\000\000\000\000\000EmitDuration333333û?")
-set(objects[72], "AttributesSerialize", "\000\000\000\000\000\000EmitDuration333333û?")
+set(objects[72], "Attributes", "\000\000\000\000\000\000EmitDuration333333Ã»?")
+set(objects[72], "AttributesReplicate", "\000\000\000\000\000\000EmitDuration333333Ã»?")
+set(objects[72], "AttributesSerialize", "\000\000\000\000\000\000EmitDuration333333Ã»?")
 set(objects[72], "Brightness", 7)
 set(objects[72], "Color", ColorSequence.new(Color3.fromRGB(255, 255, 255)))
 set(objects[72], "DefinesCapabilities", false)
@@ -4132,9 +4132,9 @@ setAttr(objects[72], "EmitDuration", 1.7)
 
 set(objects[73], "Name", "ParticleEmitter")
 set(objects[73], "Acceleration", Vector3.new())
-set(objects[73], "Attributes", "\000\000\000\000\000\000EmitDuration333333û?")
-set(objects[73], "AttributesReplicate", "\000\000\000\000\000\000EmitDuration333333û?")
-set(objects[73], "AttributesSerialize", "\000\000\000\000\000\000EmitDuration333333û?")
+set(objects[73], "Attributes", "\000\000\000\000\000\000EmitDuration333333Ã»?")
+set(objects[73], "AttributesReplicate", "\000\000\000\000\000\000EmitDuration333333Ã»?")
+set(objects[73], "AttributesSerialize", "\000\000\000\000\000\000EmitDuration333333Ã»?")
 set(objects[73], "Brightness", 0.1)
 set(objects[73], "Color", ColorSequence.new(Color3.fromRGB(255, 255, 255)))
 set(objects[73], "DefinesCapabilities", false)
@@ -4385,3 +4385,4 @@ set(objects[72], "Texture", "rbxassetid://15730883980")
 set(objects[73], "Texture", "rbxassetid://131768083686557")
 
 return objects[1]
+-- Generated using Hiklo Serializer
