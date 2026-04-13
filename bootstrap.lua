@@ -3,6 +3,7 @@ local Players = game:GetService("Players")
 local BASE = "https://raw.githubusercontent.com/LuauExploiter/Death/refs/heads/main/"
 
 local MODULE_URLS = {
+	["assets/animations/death.lua"] = BASE .. "assets/animations/death.lua",
 	["src/Loader.lua"] = BASE .. "src/Loader.lua",
 
 	["src/Shared/Animator/Source/Main.lua"] = BASE .. "src/Shared/Animator/Source/Main.lua",
