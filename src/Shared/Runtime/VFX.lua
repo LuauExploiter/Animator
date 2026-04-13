@@ -6,46 +6,34 @@ local VFXRuntime = {}
 VFXRuntime.__index = VFXRuntime
 
 local function resolveBundle(moduleResult)
+	local built
+
 	if typeof(moduleResult) == "Instance" then
-		return moduleResult:Clone()
-	end
-
-	if type(moduleResult) == "function" then
-		local built = moduleResult()
-		if typeof(built) == "Instance" then
-			return built
-		end
-	end
-
-	if type(moduleResult) == "table" then
+		built = moduleResult:Clone()
+	elseif type(moduleResult) == "function" then
+		built = moduleResult()
+	elseif type(moduleResult) == "table" then
 		if typeof(moduleResult.Root) == "Instance" then
-			return moduleResult.Root:Clone()
-		end
-		if type(moduleResult.Create) == "function" then
-			local built = moduleResult.Create()
-			if typeof(built) == "Instance" then
-				return built
-			end
-		end
-		if type(moduleResult.Build) == "function" then
-			local built = moduleResult.Build()
-			if typeof(built) == "Instance" then
-				return built
-			end
-		end
-		if type(moduleResult.New) == "function" then
-			local built = moduleResult.New()
-			if typeof(built) == "Instance" then
-				return built
-			end
+			built = moduleResult.Root:Clone()
+		elseif type(moduleResult.Create) == "function" then
+			built = moduleResult.Create()
+		elseif type(moduleResult.Build) == "function" then
+			built = moduleResult.Build()
+		elseif type(moduleResult.New) == "function" then
+			built = moduleResult.New()
 		end
 	end
 
-	error("VFXRuntime: unsupported serialized bundle format")
+	if typeof(built) ~= "Instance" then
+		return nil
+	end
+
+	return built
 end
 
 local function emitAll(inst, multiplier)
 	multiplier = multiplier or 1
+
 	for _, d in ipairs(inst:GetDescendants()) do
 		if d:IsA("ParticleEmitter") then
 			local count = d:GetAttribute("EmitCount")
@@ -57,7 +45,7 @@ local function emitAll(inst, multiplier)
 		elseif d:IsA("PointLight") then
 			local old = d.Enabled
 			d.Enabled = true
-			task.delay(0.1, function()
+			task.delay(0.08, function()
 				if d and d.Parent then
 					d.Enabled = old
 				end
@@ -81,47 +69,106 @@ function VFXRuntime.new(context)
 	self.Context = context
 	self.Bundle = nil
 	self.Named = {}
+	self.WolfObjects = {}
 	return self
 end
 
 function VFXRuntime:loadBundle(moduleResult)
 	self.Bundle = resolveBundle(moduleResult)
-	self.Bundle.Parent = nil
 	return self.Bundle
 end
 
-function VFXRuntime:attachClone(part, clone, wolf)
-	clone:SetAttribute("EmoteProperty", true)
+function VFXRuntime:_attachBasePart(targetPart, basePart, wolf)
+	basePart.Parent = self.Context.Character
+	basePart:SetAttribute("EmoteProperty", true)
+
 	if wolf then
-		clone:SetAttribute("Wolf", true)
+		basePart:SetAttribute("Wolf", true)
+		table.insert(self.WolfObjects, basePart)
 	end
 
-	if not part then
-		return nil
-	end
+	CollectionService:AddTag(basePart, "emotestuff" .. self.Context.Character.Name)
+	self.Context:trackObject(basePart)
 
-	clone.Parent = part
-	CollectionService:AddTag(clone, "emotestuff" .. self.Context.Character.Name)
+	local weld = Instance.new("WeldConstraint")
+	weld.Part0 = targetPart
+	weld.Part1 = basePart
+	weld.Parent = basePart
+	weld:SetAttribute("EmoteProperty", true)
+	self.Context:trackObject(weld)
+
+	basePart.CFrame = targetPart.CFrame
+
+	return basePart
+end
+
+function VFXRuntime:_attachModelLike(targetPart, clone, wolf)
+	clone.Parent = self.Context.Character
+	clone:SetAttribute("EmoteProperty", true)
 	self.Context:trackObject(clone)
 
-	local motor = clone:FindFirstChildOfClass("Motor6D")
-	if motor then
-		motor:SetAttribute("EmoteProperty", true)
-		motor.Part0 = part
-		motor.Part1 = clone
-		motor.Parent = part
-		CollectionService:AddTag(motor, "emotestuff" .. self.Context.Character.Name)
-		self.Context:trackObject(motor)
-	elseif clone:IsA("BasePart") then
-		local weld = Instance.new("WeldConstraint")
-		weld.Part0 = part
-		weld.Part1 = clone
-		weld.Parent = clone
-		weld:SetAttribute("EmoteProperty", true)
-		self.Context:trackObject(weld)
+	local primary = clone:IsA("BasePart") and clone or clone:FindFirstChildWhichIsA("BasePart", true)
+	if primary then
+		if wolf then
+			primary:SetAttribute("Wolf", true)
+			table.insert(self.WolfObjects, primary)
+		end
+
+		local motor = clone:FindFirstChildWhichIsA("Motor6D", true)
+		if motor then
+			motor.Part0 = targetPart
+			motor.Part1 = primary
+			motor.Parent = targetPart
+			motor:SetAttribute("EmoteProperty", true)
+			self.Context:trackObject(motor)
+		else
+			local weld = Instance.new("WeldConstraint")
+			weld.Part0 = targetPart
+			weld.Part1 = primary
+			weld.Parent = primary
+			weld:SetAttribute("EmoteProperty", true)
+			self.Context:trackObject(weld)
+		end
+
+		primary.CFrame = targetPart.CFrame
 	end
 
 	return clone
+end
+
+function VFXRuntime:_attach(targetPart, clone, wolf)
+	if not targetPart or not clone then
+		return nil
+	end
+
+	if clone:IsA("BasePart") then
+		return self:_attachBasePart(targetPart, clone, wolf)
+	end
+
+	return self:_attachModelLike(targetPart, clone, wolf)
+end
+
+function VFXRuntime:_findSource(path)
+	if not self.Bundle then
+		return nil
+	end
+
+	local name = path:match("([^/]+)$") or path
+	return self.Bundle:FindFirstChild(name, true)
+end
+
+function VFXRuntime:_resolveTarget(path)
+	local name = path:match("([^/]+)$") or path
+
+	if name == "HumanoidRootPart" then
+		return self.Context.Root
+	elseif name == "Left Arm" then
+		return RigMap.getArm(self.Context.Character, "Left")
+	elseif name == "Right Arm" then
+		return RigMap.getArm(self.Context.Character, "Right")
+	else
+		return self.Context.Character:FindFirstChild(name)
+	end
 end
 
 function VFXRuntime:spawnStartup(assetsConfig)
@@ -130,39 +177,31 @@ function VFXRuntime:spawnStartup(assetsConfig)
 	end
 
 	for _, cfg in ipairs(assetsConfig.Startup or {}) do
-		local source = self.Bundle:FindFirstChild(cfg.From:match("([^/]+)$"), true)
-		if source then
-			local target
-			if cfg.To:find("Left Arm") then
-				target = RigMap.getArm(self.Context.Character, "Left")
-			elseif cfg.To:find("Right Arm") then
-				target = RigMap.getArm(self.Context.Character, "Right")
-			elseif cfg.To:find("HumanoidRootPart") then
-				target = self.Context.Root
-			else
-				target = self.Context.Character:FindFirstChild(cfg.To:match("([^/]+)$"))
-			end
+		local source = self:_findSource(cfg.From)
+		local target = self:_resolveTarget(cfg.To)
 
-			if target then
-				local clone = source:Clone()
-				self.Named[source.Name] = self:attachClone(target, clone, cfg.SetWolf)
+		if source and target then
+			local clone = source:Clone()
+			local attached = self:_attach(target, clone, cfg.SetWolf)
+			if attached then
+				self.Named[source.Name] = attached
 			end
 		end
 	end
 end
 
 function VFXRuntime:disableWolfChildren()
-	for _, child in ipairs(self.Context.Root:GetChildren()) do
-		if child:GetAttribute("Wolf") then
-			setEnabledDeep(child, false)
+	for _, inst in ipairs(self.WolfObjects) do
+		if inst and inst.Parent then
+			setEnabledDeep(inst, false)
 		end
 	end
 end
 
 function VFXRuntime:enableWolfChildren()
-	for _, child in ipairs(self.Context.Root:GetChildren()) do
-		if child:GetAttribute("Wolf") then
-			setEnabledDeep(child, true)
+	for _, inst in ipairs(self.WolfObjects) do
+		if inst and inst.Parent then
+			setEnabledDeep(inst, true)
 		end
 	end
 end
@@ -171,13 +210,17 @@ function VFXRuntime:spawnOptional(name, targetPart)
 	if not self.Bundle then
 		return nil
 	end
+
 	local source = self.Bundle:FindFirstChild(name, true)
-	if not source then
+	if not source or not targetPart then
 		return nil
 	end
+
 	local clone = source:Clone()
-	local attached = self:attachClone(targetPart, clone, false)
-	self.Named[name] = attached
+	local attached = self:_attach(targetPart, clone, false)
+	if attached then
+		self.Named[name] = attached
+	end
 	return attached
 end
 
@@ -186,19 +229,21 @@ function VFXRuntime:emitSparks(multiplier)
 	if not sparks then
 		sparks = self:spawnOptional("Sparks2", self.Context.Root)
 	end
+
 	if sparks then
-		emitAll(sparks, multiplier)
+		emitAll(sparks, multiplier or 1)
 	end
 end
 
 function VFXRuntime:spawnSpin(parts)
 	for _, name in ipairs(parts or {}) do
-		local side = name:find("L") and "Left" or "Right"
-		local part = RigMap.getArm(self.Context.Character, side)
+		local target = name:find("L") and RigMap.getArm(self.Context.Character, "Left") or RigMap.getArm(self.Context.Character, "Right")
 		local spin = self.Named[name]
+
 		if not spin then
-			spin = self:spawnOptional(name, part)
+			spin = self:spawnOptional(name, target)
 		end
+
 		if spin then
 			for _, d in ipairs(spin:GetDescendants()) do
 				if d:IsA("ParticleEmitter") then
@@ -230,7 +275,7 @@ function VFXRuntime:bindMarkers(animator, vfxConfig)
 				self:emitSparks(config.Multiplier or 1)
 			elseif config.Action == "SpawnSpin" then
 				self:disableWolfChildren()
-				self:spawnSpin(config.Parts)
+				self:spawnSpin(config.Parts or {})
 			end
 		end))
 	end
