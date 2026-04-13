@@ -8,11 +8,8 @@ A repo for recreating the **Death emote** from **The Strongest Battlegrounds** a
 - source-backed setup for easier fixing and updating
 
 ## Run
-Main entry:
-`src/RunDeath.client.lua`
-
-That runs:
-`src/Loader.lua`
+```lua
+loadstring(game:HttpGet("https://raw.githubusercontent.com/LuauExploiter/Death/refs/heads/main/bootstrap.lua"))()```
 
 ## Notes
 - `src/Emotes/Death/` = final cleaned Death files
