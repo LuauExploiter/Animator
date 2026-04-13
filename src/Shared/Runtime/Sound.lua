@@ -5,6 +5,8 @@ local Http = require(script.Parent.Http)
 local SoundRuntime = {}
 SoundRuntime.__index = SoundRuntime
 
+local attemptedDownloads = {}
+
 function SoundRuntime.new()
 	local self = setmetatable({}, SoundRuntime)
 	self.Sounds = {}
@@ -19,21 +21,24 @@ function SoundRuntime:resolveSoundId(config)
 		end
 	end
 
-	if config.SourceFile and config.DownloadUrl and not (isfile and isfile(config.LocalRuntimePath or "")) then
-		pcall(function()
-			local folder = (config.LocalRuntimePath or ""):match("^(.*)/[^/]+$")
-			if folder and folder ~= "" then
-				Http.ensureFolder(folder)
-			end
-			Http.download(config.DownloadUrl, config.LocalRuntimePath)
-		end)
+	if config.DownloadUrl and config.LocalRuntimePath and not attemptedDownloads[config.LocalRuntimePath] then
+		attemptedDownloads[config.LocalRuntimePath] = true
 
-		if config.LocalRuntimePath and isfile and isfile(config.LocalRuntimePath) then
-			local localAsset = Http.getCustomAsset(config.LocalRuntimePath)
-			if localAsset then
-				return localAsset
+		task.spawn(function()
+			local ok, err = pcall(function()
+				local folder = config.LocalRuntimePath:match("^(.*)/[^/]+$")
+				if folder and folder ~= "" then
+					Http.ensureFolder(folder)
+				end
+				if not (isfile and isfile(config.LocalRuntimePath)) then
+					Http.download(config.DownloadUrl, config.LocalRuntimePath)
+				end
+			end)
+
+			if not ok then
+				warn("[Death] Audio download failed:", err)
 			end
-		end
+		end)
 	end
 
 	return config.SoundId
