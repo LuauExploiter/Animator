@@ -36,12 +36,6 @@ local cachedBarAttempted = false
 local cachedEmotes
 local cachedEmotesAttempted = false
 
-local cachedIcon
-local cachedIconAttempted = false
-
-local cachedNewIcon
-local cachedNewIconAttempted = false
-
 local function resolveBadWolfModule()
 	local root = script.Parent.Parent
 	local assetsFolder = root:FindFirstChild("assets")
@@ -134,28 +128,6 @@ local function preloadGui()
 			end
 		end
 	end
-
-	if not cachedIconAttempted then
-		cachedIconAttempted = true
-		local moduleScript = resolveGuiModule("Icon")
-		if moduleScript then
-			local ok, result = pcall(require, moduleScript)
-			if ok then
-				cachedIcon = result
-			end
-		end
-	end
-
-	if not cachedNewIconAttempted then
-		cachedNewIconAttempted = true
-		local moduleScript = resolveGuiModule("NewIcon")
-		if moduleScript then
-			local ok, result = pcall(require, moduleScript)
-			if ok then
-				cachedNewIcon = result
-			end
-		end
-	end
 end
 
 preloadBadWolf()
@@ -178,6 +150,13 @@ function Loader.play(character)
 		Gui = gui,
 		Animator = nil,
 	}
+
+	local function triggerDeath()
+		if getgenv and getgenv().DeathStart then
+			getgenv().DeathStart()
+			return
+		end
+	end
 
 	function session:Stop(reason)
 		if not self.Playing then
@@ -219,7 +198,7 @@ function Loader.play(character)
 
 	if cachedHotbar then
 		pcall(function()
-			gui:addHotbar(cachedHotbar)
+			gui:addHotbar(cachedHotbar, triggerDeath)
 		end)
 	end
 
@@ -229,23 +208,16 @@ function Loader.play(character)
 		end)
 	end
 
+	local emotesGui
 	if cachedEmotes then
 		pcall(function()
-			gui:addEmotes(cachedEmotes)
+			emotesGui = gui:addEmotes(cachedEmotes, triggerDeath)
 		end)
 	end
 
-	if cachedIcon then
-		pcall(function()
-			gui:addIcon(cachedIcon)
-		end)
-	end
-
-	if cachedNewIcon then
-		pcall(function()
-			gui:addNewIcon(cachedNewIcon)
-		end)
-	end
+	pcall(function()
+		gui:addTopIcon(emotesGui)
+	end)
 
 	camera:bindMarkers(animator, CameraData)
 
