@@ -11,8 +11,3 @@ A repo for recreating the **Death emote** from **The Strongest Battlegrounds** a
 ```lua
 loadstring(game:HttpGet("https://raw.githubusercontent.com/LuauExploiter/Death/refs/heads/main/bootstrap.lua"))()
 ```
-
-## Notes
-- `src/Emotes/Death/` = final cleaned Death files
-- `imports/raw/Death/` = raw source/reference files
-- `assets/vfx/death/BadWolf.lua` = serialized Death VFX bundle
