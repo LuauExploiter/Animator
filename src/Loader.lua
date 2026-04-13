@@ -2,7 +2,7 @@ local Shared = script.Parent:WaitForChild("Shared")
 local EmotesFolder = script.Parent:WaitForChild("Emotes")
 local DeathFolder = EmotesFolder:WaitForChild("Death")
 
-local Animator = require(Shared.Animator:WaitForChild("Main"))
+local Animator = require(Shared.Animator:WaitForChild("Source"):WaitForChild("Main"))
 local CharacterRuntime = require(Shared.Runtime:WaitForChild("Character"))
 local SoundRuntime = require(Shared.Runtime:WaitForChild("Sound"))
 local VFXRuntime = require(Shared.Runtime:WaitForChild("VFX"))
@@ -93,9 +93,8 @@ function Loader.play(character)
 
 	camera:bindMarkers(animator, CameraData)
 
-	local mainSound
 	if Sounds.Main then
-		mainSound = sounds:playMain(context.Root, Sounds.Main)
+		sounds:playMain(context.Root, Sounds.Main)
 	end
 
 	animator:Play(0.03, 1, 1)
