@@ -2,7 +2,7 @@ local Shared = script.Parent:WaitForChild("Shared")
 local EmotesFolder = script.Parent:WaitForChild("Emotes")
 local DeathFolder = EmotesFolder:WaitForChild("Death")
 
-local Animator = require(Shared:WaitForChild("Animator"):WaitForChild("Source"):WaitForChild("Main"))
+local Animator = require(Shared:WaitForChild("Animator"):WaitForChild("Source"):WaitForChild("Animator"))
 
 local Runtime = Shared:WaitForChild("Runtime")
 local CharacterRuntime = require(Runtime:WaitForChild("Character"))
