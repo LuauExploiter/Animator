@@ -1,0 +1,8 @@
+- maintained animator fork
+- animation data
+- sounds
+- vfx
+- camera
+- cleanup
+- assets
+- game adapter
