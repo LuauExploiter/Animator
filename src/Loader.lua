@@ -2,14 +2,15 @@ local Shared = script.Parent:WaitForChild("Shared")
 local EmotesFolder = script.Parent:WaitForChild("Emotes")
 local DeathFolder = EmotesFolder:WaitForChild("Death")
 
-local Animator = require(Shared.Animator:WaitForChild("Source"):WaitForChild("Main"))
-local CharacterRuntime = require(Shared.Runtime:WaitForChild("Character"))
-local SoundRuntime = require(Shared.Runtime:WaitForChild("Sound"))
-local VFXRuntime = require(Shared.Runtime:WaitForChild("VFX"))
-local CameraRuntime = require(Shared.Runtime:WaitForChild("Camera"))
-local Cleanup = require(Shared.Runtime:WaitForChild("Cleanup"))
-local InputRuntime = require(Shared.Runtime:WaitForChild("Input"))
-local Util = require(Shared.Runtime:WaitForChild("Util"))
+local Animator = require(Shared:WaitForChild("Animator"):WaitForChild("Source"):WaitForChild("Main"))
+
+local Runtime = Shared:WaitForChild("Runtime")
+local CharacterRuntime = require(Runtime:WaitForChild("Character"))
+local SoundRuntime = require(Runtime:WaitForChild("Sound"))
+local VFXRuntime = require(Runtime:WaitForChild("VFX"))
+local CameraRuntime = require(Runtime:WaitForChild("Camera"))
+local Cleanup = require(Runtime:WaitForChild("Cleanup"))
+local InputRuntime = require(Runtime:WaitForChild("Input"))
 
 local Manifest = require(DeathFolder:WaitForChild("Manifest"))
 local AnimationData = require(DeathFolder:WaitForChild("AnimationData"))
@@ -17,6 +18,7 @@ local Sounds = require(DeathFolder:WaitForChild("Sounds"))
 local VFXData = require(DeathFolder:WaitForChild("VFX"))
 local CameraData = require(DeathFolder:WaitForChild("Camera"))
 local Assets = require(DeathFolder:WaitForChild("Assets"))
+
 local Adapter = require(script.Parent:WaitForChild("GameAdapters"):WaitForChild("Universal"))
 
 local Loader = {}
@@ -33,12 +35,12 @@ local function resolveBadWolfModule()
 		return nil
 	end
 
-	local deathFolder = vfxFolder:FindFirstChild("death")
-	if not deathFolder then
+	local deathAssetsFolder = vfxFolder:FindFirstChild("death")
+	if not deathAssetsFolder then
 		return nil
 	end
 
-	return deathFolder:FindFirstChild("BadWolf")
+	return deathAssetsFolder:FindFirstChild("BadWolf")
 end
 
 function Loader.play(character)
@@ -61,6 +63,7 @@ function Loader.play(character)
 		if not self.Playing then
 			return
 		end
+
 		self.Playing = false
 
 		if context._restoreMobileButtons then
@@ -78,6 +81,7 @@ function Loader.play(character)
 		Markers = AnimationData.Markers or {},
 		Looped = AnimationData.Looped or Manifest.Looped,
 	})
+
 	animator.Looped = AnimationData.Looped or Manifest.Looped
 	session.Animator = animator
 
@@ -88,6 +92,8 @@ function Loader.play(character)
 			vfx:loadBundle(result)
 			vfx:spawnStartup(Assets)
 			vfx:bindMarkers(animator, VFXData)
+		else
+			warn("[Death] BadWolf load failed:", result)
 		end
 	end
 
