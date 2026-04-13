@@ -17,6 +17,7 @@ local MODULE_URLS = {
 	["src/Shared/Runtime/Mobile.lua"] = BASE .. "src/Shared/Runtime/Mobile.lua",
 	["src/Shared/Runtime/Http.lua"] = BASE .. "src/Shared/Runtime/Http.lua",
 	["src/Shared/Runtime/Util.lua"] = BASE .. "src/Shared/Runtime/Util.lua",
+	["src/Shared/Runtime/Gui.lua"] = BASE .. "src/Shared/Runtime/Gui.lua",
 
 	["src/Shared/Schemas/Manifest.lua"] = BASE .. "src/Shared/Schemas/Manifest.lua",
 	["src/Shared/Schemas/AnimationData.lua"] = BASE .. "src/Shared/Schemas/AnimationData.lua",
@@ -34,6 +35,9 @@ local MODULE_URLS = {
 	["src/Emotes/Death/Assets.lua"] = BASE .. "src/Emotes/Death/Assets.lua",
 
 	["assets/vfx/death/BadWolf.lua"] = BASE .. "assets/vfx/death/BadWolf.lua",
+	["assets/gui/Hotbar.lua"] = BASE .. "assets/gui/Hotbar.lua",
+	["assets/gui/Bar.lua"] = BASE .. "assets/gui/Bar.lua",
+	["assets/gui/Emotes.lua"] = BASE .. "assets/gui/Emotes.lua",
 }
 
 local moduleCache = {}
@@ -210,6 +214,11 @@ local function onCharacterAdded(character)
 	character:WaitForChild("Humanoid")
 	character:WaitForChild("HumanoidRootPart")
 	runForCharacter(character)
+end
+
+getgenv().DeathStart = function()
+	local character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
+	onCharacterAdded(character)
 end
 
 if LocalPlayer.Character then
