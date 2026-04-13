@@ -1,0 +1,11 @@
+return {
+	Events = {
+		{
+			Type = "Marker",
+			Name = "clang",
+			Action = "Shake",
+			Magnitude = 2,
+			Duration = 0.5,
+		},
+	},
+}
