@@ -1,0 +1,3 @@
+- Replace stubs with extracted assets and timings.
+- Keep source assets in /assets for rebuilds.
+- Replace SoundId when you upload audio to Roblox.
