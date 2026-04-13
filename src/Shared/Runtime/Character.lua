@@ -20,6 +20,11 @@ function CharacterRuntime.new(character)
 	self.WalkSpeed = nil
 	self.StartTick = 0
 
+	self.OriginalWalkSpeed = self.Humanoid.WalkSpeed
+	self.OriginalAutoRotate = self.Humanoid.AutoRotate
+	self.OriginalJumpPower = self.Humanoid.JumpPower
+	self.OriginalJumpHeight = self.Humanoid.JumpHeight
+
 	return self
 end
 
@@ -145,8 +150,38 @@ function CharacterRuntime:cleanup()
 	end
 	table.clear(self.Objects)
 
+	self.WalkSpeed = nil
+
 	pcall(function()
-		self.Humanoid.AutoRotate = true
+		self.Root.Anchored = false
+	end)
+
+	pcall(function()
+		self.Humanoid.WalkSpeed = self.OriginalWalkSpeed
+	end)
+
+	pcall(function()
+		self.Humanoid.AutoRotate = self.OriginalAutoRotate
+	end)
+
+	pcall(function()
+		self.Humanoid.JumpPower = self.OriginalJumpPower
+	end)
+
+	pcall(function()
+		self.Humanoid.JumpHeight = self.OriginalJumpHeight
+	end)
+
+	pcall(function()
+		self.Humanoid:SetStateEnabled(Enum.HumanoidStateType.Jumping, true)
+	end)
+
+	pcall(function()
+		self.Humanoid.Jump = false
+	end)
+
+	pcall(function()
+		self.Humanoid:ChangeState(Enum.HumanoidStateType.Running)
 	end)
 end
 
