@@ -131,6 +131,8 @@ function GuiRuntime:addExactHotbar(serializerModuleResult, onDeath)
 		return nil
 	end
 
+	root.Enabled = true
+
 	local template = findFirstDescendant(root, function(d)
 		return d:IsA("TextButton") and d.Name == "Base"
 	end)
@@ -288,7 +290,6 @@ function GuiRuntime:addTopbarEmotesIcon(emotesGui)
 
 	if emotesGui then
 		local bound = false
-
 		pcall(function()
 			icon:bindToggleItem(emotesGui)
 			bound = true
