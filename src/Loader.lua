@@ -134,7 +134,15 @@ local function triggerDeath()
 		end)
 	end
 
-	currentSession = Loader.play(character)
+	local ok, result = pcall(function()
+		return Loader.play(character)
+	end)
+
+	if ok then
+		currentSession = result
+	else
+		warn("[Death] Trigger failed:", result)
+	end
 end
 
 local function ensureExactGui()
