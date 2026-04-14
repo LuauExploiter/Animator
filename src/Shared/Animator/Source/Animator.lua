@@ -240,7 +240,11 @@ function Animator:_playPose(pose, parent, fade)
 		IgnoreIn = self.BoneIgnoreInList,
 		IgnoreList = self.BoneIgnoreList,
 	})
-	local TI = TweenInfo.new(fade, pose.EasingStyle, pose.EasingDirection)
+	local TI = TweenInfo.new(
+	fade,
+	coerceEasingStyle(pose.EasingStyle),
+	coerceEasingDirection(pose.EasingDirection)
+)
 	local Target = { Transform = pose.CFrame }
 	local M = MotorMap[parent.Name]
 	local B = BoneMap[parent.Name]
