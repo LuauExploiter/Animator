@@ -86,17 +86,6 @@ local function setSlotText(slot, index, name)
 	end
 end
 
-local function ensureChild(parent, className, name)
-	local existing = parent:FindFirstChild(name)
-	if existing and existing:IsA(className) then
-		return existing
-	end
-	local obj = Instance.new(className)
-	obj.Name = name
-	obj.Parent = parent
-	return obj
-end
-
 function GuiRuntime.new()
 	local self = setmetatable({}, GuiRuntime)
 	self.PlayerGui = Players.LocalPlayer:WaitForChild("PlayerGui")
@@ -113,78 +102,17 @@ function GuiRuntime:_removePlayerGuiCopy(name)
 	end
 end
 
-function GuiRuntime:_ensureCompatScaffold(name)
-	if name == "Hotbar" then
-		local gui = StarterGui:FindFirstChild("Hotbar")
-		if not (gui and gui:IsA("ScreenGui")) then
-			if gui then gui:Destroy() end
-			gui = Instance.new("ScreenGui")
-			gui.Name = "Hotbar"
-			gui.ResetOnSpawn = false
-			gui.Parent = StarterGui
-		end
-
-		local backpack = ensureChild(gui, "Frame", "Backpack")
-		backpack.Size = UDim2.fromScale(1, 1)
-		backpack.BackgroundTransparency = 1
-
-		ensureChild(backpack, "LocalScript", "LocalScript")
-		return gui
-	elseif name == "Emotes" then
-		local gui = StarterGui:FindFirstChild("Emotes")
-		if not (gui and gui:IsA("ScreenGui")) then
-			if gui then gui:Destroy() end
-			gui = Instance.new("ScreenGui")
-			gui.Name = "Emotes"
-			gui.ResetOnSpawn = false
-			gui.Parent = StarterGui
-		end
-
-		ensureChild(gui, "LocalScript", "LocalScript")
-		return gui
-	elseif name == "Bar" then
-		local gui = StarterGui:FindFirstChild("Bar")
-		if not (gui and gui:IsA("ScreenGui")) then
-			if gui then gui:Destroy() end
-			gui = Instance.new("ScreenGui")
-			gui.Name = "Bar"
-			gui.ResetOnSpawn = false
-			gui.Parent = StarterGui
-		end
-		return gui
-	end
-end
-
-function GuiRuntime:_buildIntoStarter(name, serializerModuleResult)
-	self:_ensureCompatScaffold(name)
-
-	local existing = StarterGui:FindFirstChild(name)
-	if existing and existing:IsA("ScreenGui") and #existing:GetChildren() > 0 then
-		local onlyCompat = true
-		for _, child in ipairs(existing:GetChildren()) do
-			if name == "Hotbar" and child.Name ~= "Backpack" then
-				onlyCompat = false
-				break
-			elseif name == "Emotes" and child.Name ~= "LocalScript" then
-				onlyCompat = false
-				break
-			elseif name == "Bar" then
-				onlyCompat = false
-				break
-			end
-		end
-		if not onlyCompat then
-			return existing
-		end
-	end
-
-	resolveBundle(serializerModuleResult)
-	return StarterGui:FindFirstChild(name)
-end
-
 function GuiRuntime:_cloneExactGui(name, serializerModuleResult)
-	local starterCopy = self:_buildIntoStarter(name, serializerModuleResult)
+	local starterCopy = StarterGui:FindFirstChild(name)
 	if not starterCopy then
+		local built = resolveBundle(serializerModuleResult)
+		if not built then
+			return nil
+		end
+		starterCopy = StarterGui:FindFirstChild(name) or built
+	end
+
+	if not starterCopy:IsA("ScreenGui") then
 		return nil
 	end
 
@@ -234,8 +162,6 @@ function GuiRuntime:addExactHotbar(serializerModuleResult, onDeath)
 						onDeath()
 					end
 				end)
-			else
-				slot.MouseButton1Click:Connect(function() end)
 			end
 		end
 	end
@@ -353,11 +279,9 @@ function GuiRuntime:addTopbarEmotesIcon(emotesGui)
 	pcall(function()
 		icon:setName("DeathEmotes")
 	end)
-
 	pcall(function()
 		icon:setLabel("Emotes")
 	end)
-
 	pcall(function()
 		icon:align("Center")
 	end)
