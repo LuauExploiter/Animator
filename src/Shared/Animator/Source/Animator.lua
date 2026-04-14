@@ -45,6 +45,50 @@ local Utility = animatorRequire("Utility.lua")
 
 local Signal = animatorRequire("Nevermore/Signal.lua")
 local Maid = animatorRequire("Nevermore/Maid.lua")
+local function coerceEasingStyle(value)
+	if typeof(value) == "EnumItem" then
+		if value.EnumType == Enum.EasingStyle then
+			return value
+		end
+		local ok, converted = pcall(function()
+			return Utility:convertEnum(value)
+		end)
+		if ok and typeof(converted) == "EnumItem" and converted.EnumType == Enum.EasingStyle then
+			return converted
+		end
+	end
+
+	if type(value) == "string" then
+		local name = value:match("([%w_]+)$") or value
+		if name == "Constant" then
+			name = "Linear"
+		end
+		return Enum.EasingStyle[name] or Enum.EasingStyle.Linear
+	end
+
+	return Enum.EasingStyle.Linear
+end
+
+local function coerceEasingDirection(value)
+	if typeof(value) == "EnumItem" then
+		if value.EnumType == Enum.EasingDirection then
+			return value
+		end
+		local ok, converted = pcall(function()
+			return Utility:convertEnum(value)
+		end)
+		if ok and typeof(converted) == "EnumItem" and converted.EnumType == Enum.EasingDirection then
+			return converted
+		end
+	end
+
+	if type(value) == "string" then
+		local name = value:match("([%w_]+)$") or value
+		return Enum.EasingDirection[name] or Enum.EasingDirection.InOut
+	end
+
+	return Enum.EasingDirection.InOut
+end
 
 function merge(t1, t2)
 	for k, v in pairs(t2) do
