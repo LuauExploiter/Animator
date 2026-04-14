@@ -1,3 +1,4 @@
+local RunService = game:GetService("RunService")
 local CollectionService = game:GetService("CollectionService")
 
 local RigMap = require(script.Parent.RigMap)
@@ -65,7 +66,7 @@ local function setEnabledDeep(inst, enabled)
 end
 
 local function sanitizeBasePart(part)
-	part.Anchored = false
+	part.Anchored = true
 	part.CanCollide = false
 	part.CanTouch = false
 	part.CanQuery = false
@@ -78,6 +79,10 @@ local function sanitizeBasePart(part)
 end
 
 local function sanitizeClone(root)
+	if root:IsA("BasePart") then
+		sanitizeBasePart(root)
+	end
+
 	for _, d in ipairs(root:GetDescendants()) do
 		if d:IsA("BasePart") then
 			sanitizeBasePart(d)
@@ -87,13 +92,9 @@ local function sanitizeClone(root)
 			end)
 		end
 	end
-
-	if root:IsA("BasePart") then
-		sanitizeBasePart(root)
-	end
 end
 
-local function getAttachPartForClone(clone)
+local function getAttachRoot(clone)
 	if clone:IsA("BasePart") then
 		return clone
 	end
@@ -105,12 +106,29 @@ local function getAttachPartForClone(clone)
 	return clone:FindFirstChildWhichIsA("BasePart", true)
 end
 
+local function getAllBaseParts(root)
+	local parts = {}
+
+	if root:IsA("BasePart") then
+		table.insert(parts, root)
+	end
+
+	for _, d in ipairs(root:GetDescendants()) do
+		if d:IsA("BasePart") then
+			table.insert(parts, d)
+		end
+	end
+
+	return parts
+end
+
 function VFXRuntime.new(context)
 	local self = setmetatable({}, VFXRuntime)
 	self.Context = context
 	self.Bundle = nil
 	self.Named = {}
 	self.WolfObjects = {}
+	self.Attachments = {}
 	return self
 end
 
@@ -119,7 +137,7 @@ function VFXRuntime:loadBundle(moduleResult)
 	return self.Bundle
 end
 
-function VFXRuntime:_tagTracked(obj, wolf)
+function VFXRuntime:_trackObject(obj, wolf)
 	obj:SetAttribute("EmoteProperty", true)
 	CollectionService:AddTag(obj, "emotestuff" .. self.Context.Character.Name)
 	self.Context:trackObject(obj)
@@ -130,44 +148,53 @@ function VFXRuntime:_tagTracked(obj, wolf)
 	end
 end
 
-function VFXRuntime:_attach(targetPart, clone, wolf)
+function VFXRuntime:_hardAttach(targetPart, clone, wolf)
 	if not targetPart or not clone then
 		return nil
 	end
 
 	sanitizeClone(clone)
 	clone.Parent = self.Context.Character
+	self:_trackObject(clone, false)
 
-	self:_tagTracked(clone, false)
-
-	local attachPart = getAttachPartForClone(clone)
-	if not attachPart then
+	local attachRoot = getAttachRoot(clone)
+	if not attachRoot then
 		return clone
 	end
 
+	local parts = getAllBaseParts(clone)
+	local partOffsets = {}
+
+	for _, part in ipairs(parts) do
+		partOffsets[part] = attachRoot.CFrame:ToObjectSpace(part.CFrame)
+	end
+
+	local rootOffset = targetPart.CFrame:ToObjectSpace(attachRoot.CFrame)
+
 	if wolf then
-		attachPart:SetAttribute("Wolf", true)
-		table.insert(self.WolfObjects, attachPart)
+		attachRoot:SetAttribute("Wolf", true)
+		table.insert(self.WolfObjects, attachRoot)
 	end
 
-	attachPart.CFrame = targetPart.CFrame
+	local conn
+	conn = RunService.RenderStepped:Connect(function()
+		if not targetPart.Parent or not clone.Parent or not attachRoot.Parent then
+			if conn then
+				conn:Disconnect()
+			end
+			return
+		end
 
-	local motor = clone:FindFirstChildWhichIsA("Motor6D", true)
-	if motor and attachPart ~= targetPart then
-		motor.Part0 = targetPart
-		motor.Part1 = attachPart
-		motor.Parent = targetPart
-		motor:SetAttribute("EmoteProperty", true)
-		self.Context:trackObject(motor)
-	else
-		local weld = Instance.new("WeldConstraint")
-		weld.Part0 = targetPart
-		weld.Part1 = attachPart
-		weld.Parent = attachPart
-		weld:SetAttribute("EmoteProperty", true)
-		self.Context:trackObject(weld)
-	end
+		local rootCF = targetPart.CFrame * rootOffset
 
+		for _, part in ipairs(parts) do
+			if part.Parent then
+				part.CFrame = rootCF * partOffsets[part]
+			end
+		end
+	end)
+
+	self.Context:trackConnection(conn)
 	return clone
 end
 
@@ -205,7 +232,7 @@ function VFXRuntime:spawnStartup(assetsConfig)
 
 		if source and target then
 			local clone = source:Clone()
-			local attached = self:_attach(target, clone, cfg.SetWolf)
+			local attached = self:_hardAttach(target, clone, cfg.SetWolf)
 			if attached then
 				self.Named[source.Name] = attached
 			end
@@ -240,7 +267,7 @@ function VFXRuntime:spawnOptional(name, targetPart)
 	end
 
 	local clone = source:Clone()
-	local attached = self:_attach(targetPart, clone, false)
+	local attached = self:_hardAttach(targetPart, clone, false)
 	if attached then
 		self.Named[name] = attached
 	end
