@@ -3,31 +3,11 @@ local Players = game:GetService("Players")
 local BASE = "https://raw.githubusercontent.com/LuauExploiter/Death/refs/heads/main/"
 
 local MODULE_URLS = {
-	["src/Packages/Icon/Icon.lua"] = BASE .. "src/Packages/Icon/Icon.lua",
-["src/Packages/Icon/IconController.lua"] = BASE .. "src/Packages/Icon/IconController.lua",
-["src/Packages/Icon/Maid.lua"] = BASE .. "src/Packages/Icon/Maid.lua",
-["src/Packages/Icon/Signal.lua"] = BASE .. "src/Packages/Icon/Signal.lua",
-["src/Packages/Icon/TopbarPlusGui.lua"] = BASE .. "src/Packages/Icon/TopbarPlusGui.lua",
-["src/Packages/Icon/TopbarPlusReference.lua"] = BASE .. "src/Packages/Icon/TopbarPlusReference.lua",
-["src/Packages/Icon/VERSION.lua"] = BASE .. "src/Packages/Icon/VERSION.lua",
-["src/Packages/Icon/Themes.lua"] = BASE .. "src/Packages/Icon/Themes.lua",
-["src/Packages/Icon/Themes/BlueGradient.lua"] = BASE .. "src/Packages/Icon/Themes/BlueGradient.lua",
-["src/Packages/Icon/Themes/Default.lua"] = BASE .. "src/Packages/Icon/Themes/Default.lua",
-
-["src/Packages/NewIcon/NewIcon.lua"] = BASE .. "src/Packages/NewIcon/NewIcon.lua",
-["src/Packages/NewIcon/IconController.lua"] = BASE .. "src/Packages/NewIcon/IconController.lua",
-["src/Packages/NewIcon/Maid.lua"] = BASE .. "src/Packages/NewIcon/Maid.lua",
-["src/Packages/NewIcon/Signal.lua"] = BASE .. "src/Packages/NewIcon/Signal.lua",
-["src/Packages/NewIcon/TopbarPlusGui.lua"] = BASE .. "src/Packages/NewIcon/TopbarPlusGui.lua",
-["src/Packages/NewIcon/TopbarPlusReference.lua"] = BASE .. "src/Packages/NewIcon/TopbarPlusReference.lua",
-["src/Packages/NewIcon/VERSION.lua"] = BASE .. "src/Packages/NewIcon/VERSION.lua",
-["src/Packages/NewIcon/Themes.lua"] = BASE .. "src/Packages/NewIcon/Themes.lua",
-["src/Packages/NewIcon/Themes/BlueGradient.lua"] = BASE .. "src/Packages/NewIcon/Themes/BlueGradient.lua",
-["src/Packages/NewIcon/Themes/Default.lua"] = BASE .. "src/Packages/NewIcon/Themes/Default.lua",
-	["assets/animations/death.lua"] = BASE .. "assets/animations/death.lua",
 	["src/Loader.lua"] = BASE .. "src/Loader.lua",
 
 	["src/Shared/Animator/Source/Main.lua"] = BASE .. "src/Shared/Animator/Source/Main.lua",
+	["src/Shared/Animator/Source/Animator.lua"] = BASE .. "src/Shared/Animator/Source/Animator.lua",
+	["src/Shared/Animator/Source/Utility.lua"] = BASE .. "src/Shared/Animator/Source/Utility.lua",
 
 	["src/Shared/Runtime/Character.lua"] = BASE .. "src/Shared/Runtime/Character.lua",
 	["src/Shared/Runtime/Camera.lua"] = BASE .. "src/Shared/Runtime/Camera.lua",
@@ -56,10 +36,33 @@ local MODULE_URLS = {
 	["src/Emotes/Death/Cleanup.lua"] = BASE .. "src/Emotes/Death/Cleanup.lua",
 	["src/Emotes/Death/Assets.lua"] = BASE .. "src/Emotes/Death/Assets.lua",
 
+	["src/Packages/Icon/Icon.lua"] = BASE .. "src/Packages/Icon/Icon.lua",
+	["src/Packages/Icon/IconController.lua"] = BASE .. "src/Packages/Icon/IconController.lua",
+	["src/Packages/Icon/Maid.lua"] = BASE .. "src/Packages/Icon/Maid.lua",
+	["src/Packages/Icon/Signal.lua"] = BASE .. "src/Packages/Icon/Signal.lua",
+	["src/Packages/Icon/TopbarPlusGui.lua"] = BASE .. "src/Packages/Icon/TopbarPlusGui.lua",
+	["src/Packages/Icon/TopbarPlusReference.lua"] = BASE .. "src/Packages/Icon/TopbarPlusReference.lua",
+	["src/Packages/Icon/VERSION.lua"] = BASE .. "src/Packages/Icon/VERSION.lua",
+	["src/Packages/Icon/Themes.lua"] = BASE .. "src/Packages/Icon/Themes.lua",
+	["src/Packages/Icon/Themes/BlueGradient.lua"] = BASE .. "src/Packages/Icon/Themes/BlueGradient.lua",
+	["src/Packages/Icon/Themes/Default.lua"] = BASE .. "src/Packages/Icon/Themes/Default.lua",
+
+	["src/Packages/NewIcon/NewIcon.lua"] = BASE .. "src/Packages/NewIcon/NewIcon.lua",
+	["src/Packages/NewIcon/IconController.lua"] = BASE .. "src/Packages/NewIcon/IconController.lua",
+	["src/Packages/NewIcon/Maid.lua"] = BASE .. "src/Packages/NewIcon/Maid.lua",
+	["src/Packages/NewIcon/Signal.lua"] = BASE .. "src/Packages/NewIcon/Signal.lua",
+	["src/Packages/NewIcon/TopbarPlusGui.lua"] = BASE .. "src/Packages/NewIcon/TopbarPlusGui.lua",
+	["src/Packages/NewIcon/TopbarPlusReference.lua"] = BASE .. "src/Packages/NewIcon/TopbarPlusReference.lua",
+	["src/Packages/NewIcon/VERSION.lua"] = BASE .. "src/Packages/NewIcon/VERSION.lua",
+	["src/Packages/NewIcon/Themes.lua"] = BASE .. "src/Packages/NewIcon/Themes.lua",
+	["src/Packages/NewIcon/Themes/BlueGradient.lua"] = BASE .. "src/Packages/NewIcon/Themes/BlueGradient.lua",
+	["src/Packages/NewIcon/Themes/Default.lua"] = BASE .. "src/Packages/NewIcon/Themes/Default.lua",
+
 	["assets/vfx/death/BadWolf.lua"] = BASE .. "assets/vfx/death/BadWolf.lua",
 	["assets/gui/Hotbar.lua"] = BASE .. "assets/gui/Hotbar.lua",
 	["assets/gui/Bar.lua"] = BASE .. "assets/gui/Bar.lua",
 	["assets/gui/Emotes.lua"] = BASE .. "assets/gui/Emotes.lua",
+	["assets/animations/death.lua"] = BASE .. "assets/animations/death.lua",
 }
 
 local moduleCache = {}
@@ -74,9 +77,9 @@ local NodeMT = {
 			return method
 		end
 
-		local child = rawget(self, "__children")
-		if child and child[key] ~= nil then
-			return child[key]
+		local children = rawget(self, "__children")
+		if children and children[key] ~= nil then
+			return children[key]
 		end
 
 		return rawget(self, key)
