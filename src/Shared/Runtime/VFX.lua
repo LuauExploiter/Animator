@@ -64,6 +64,47 @@ local function setEnabledDeep(inst, enabled)
 	end
 end
 
+local function sanitizeBasePart(part)
+	part.Anchored = false
+	part.CanCollide = false
+	part.CanTouch = false
+	part.CanQuery = false
+	part.Massless = true
+	part.CastShadow = false
+	part.AssemblyLinearVelocity = Vector3.zero
+	part.AssemblyAngularVelocity = Vector3.zero
+	part.Velocity = Vector3.zero
+	part.RotVelocity = Vector3.zero
+end
+
+local function sanitizeClone(root)
+	for _, d in ipairs(root:GetDescendants()) do
+		if d:IsA("BasePart") then
+			sanitizeBasePart(d)
+		elseif d:IsA("Script") or d:IsA("LocalScript") then
+			pcall(function()
+				d.Disabled = true
+			end)
+		end
+	end
+
+	if root:IsA("BasePart") then
+		sanitizeBasePart(root)
+	end
+end
+
+local function getAttachPartForClone(clone)
+	if clone:IsA("BasePart") then
+		return clone
+	end
+
+	if clone:IsA("Model") then
+		return clone.PrimaryPart or clone:FindFirstChildWhichIsA("BasePart", true)
+	end
+
+	return clone:FindFirstChildWhichIsA("BasePart", true)
+end
+
 function VFXRuntime.new(context)
 	local self = setmetatable({}, VFXRuntime)
 	self.Context = context
@@ -78,62 +119,15 @@ function VFXRuntime:loadBundle(moduleResult)
 	return self.Bundle
 end
 
-function VFXRuntime:_attachBasePart(targetPart, basePart, wolf)
-	basePart.Parent = self.Context.Character
-	basePart:SetAttribute("EmoteProperty", true)
+function VFXRuntime:_tagTracked(obj, wolf)
+	obj:SetAttribute("EmoteProperty", true)
+	CollectionService:AddTag(obj, "emotestuff" .. self.Context.Character.Name)
+	self.Context:trackObject(obj)
 
 	if wolf then
-		basePart:SetAttribute("Wolf", true)
-		table.insert(self.WolfObjects, basePart)
+		obj:SetAttribute("Wolf", true)
+		table.insert(self.WolfObjects, obj)
 	end
-
-	CollectionService:AddTag(basePart, "emotestuff" .. self.Context.Character.Name)
-	self.Context:trackObject(basePart)
-
-	local weld = Instance.new("WeldConstraint")
-	weld.Part0 = targetPart
-	weld.Part1 = basePart
-	weld.Parent = basePart
-	weld:SetAttribute("EmoteProperty", true)
-	self.Context:trackObject(weld)
-
-	basePart.CFrame = targetPart.CFrame
-
-	return basePart
-end
-
-function VFXRuntime:_attachModelLike(targetPart, clone, wolf)
-	clone.Parent = self.Context.Character
-	clone:SetAttribute("EmoteProperty", true)
-	self.Context:trackObject(clone)
-
-	local primary = clone:IsA("BasePart") and clone or clone:FindFirstChildWhichIsA("BasePart", true)
-	if primary then
-		if wolf then
-			primary:SetAttribute("Wolf", true)
-			table.insert(self.WolfObjects, primary)
-		end
-
-		local motor = clone:FindFirstChildWhichIsA("Motor6D", true)
-		if motor then
-			motor.Part0 = targetPart
-			motor.Part1 = primary
-			motor.Parent = targetPart
-			motor:SetAttribute("EmoteProperty", true)
-			self.Context:trackObject(motor)
-		else
-			local weld = Instance.new("WeldConstraint")
-			weld.Part0 = targetPart
-			weld.Part1 = primary
-			weld.Parent = primary
-			weld:SetAttribute("EmoteProperty", true)
-			self.Context:trackObject(weld)
-		end
-
-		primary.CFrame = targetPart.CFrame
-	end
-
-	return clone
 end
 
 function VFXRuntime:_attach(targetPart, clone, wolf)
@@ -141,11 +135,40 @@ function VFXRuntime:_attach(targetPart, clone, wolf)
 		return nil
 	end
 
-	if clone:IsA("BasePart") then
-		return self:_attachBasePart(targetPart, clone, wolf)
+	sanitizeClone(clone)
+	clone.Parent = self.Context.Character
+
+	self:_tagTracked(clone, false)
+
+	local attachPart = getAttachPartForClone(clone)
+	if not attachPart then
+		return clone
 	end
 
-	return self:_attachModelLike(targetPart, clone, wolf)
+	if wolf then
+		attachPart:SetAttribute("Wolf", true)
+		table.insert(self.WolfObjects, attachPart)
+	end
+
+	attachPart.CFrame = targetPart.CFrame
+
+	local motor = clone:FindFirstChildWhichIsA("Motor6D", true)
+	if motor and attachPart ~= targetPart then
+		motor.Part0 = targetPart
+		motor.Part1 = attachPart
+		motor.Parent = targetPart
+		motor:SetAttribute("EmoteProperty", true)
+		self.Context:trackObject(motor)
+	else
+		local weld = Instance.new("WeldConstraint")
+		weld.Part0 = targetPart
+		weld.Part1 = attachPart
+		weld.Parent = attachPart
+		weld:SetAttribute("EmoteProperty", true)
+		self.Context:trackObject(weld)
+	end
+
+	return clone
 end
 
 function VFXRuntime:_findSource(path)
@@ -266,18 +289,21 @@ end
 
 function VFXRuntime:bindMarkers(animator, vfxConfig)
 	for markerName, config in pairs(vfxConfig.Keyframes or {}) do
-		self.Context:trackConnection(animator:GetMarkerReachedSignal(markerName):Connect(function()
-			if config.Action == "DisableWolfChildren" then
-				self:disableWolfChildren()
-			elseif config.Action == "EnableWolfChildren" then
-				self:enableWolfChildren()
-			elseif config.Action == "EmitSparks2" then
-				self:emitSparks(config.Multiplier or 1)
-			elseif config.Action == "SpawnSpin" then
-				self:disableWolfChildren()
-				self:spawnSpin(config.Parts or {})
-			end
-		end))
+		local signal = animator:GetMarkerReachedSignal(markerName)
+		if signal and signal.Connect then
+			self.Context:trackConnection(signal:Connect(function()
+				if config.Action == "DisableWolfChildren" then
+					self:disableWolfChildren()
+				elseif config.Action == "EnableWolfChildren" then
+					self:enableWolfChildren()
+				elseif config.Action == "EmitSparks2" then
+					self:emitSparks(config.Multiplier or 1)
+				elseif config.Action == "SpawnSpin" then
+					self:disableWolfChildren()
+					self:spawnSpin(config.Parts or {})
+				end
+			end))
+		end
 	end
 end
 
