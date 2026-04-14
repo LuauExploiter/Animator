@@ -164,8 +164,6 @@ function Loader.play(character)
 		if not ok then
 			warn("[Death] BadWolf runtime load failed:", err)
 		end
-	else
-		warn("[Death] BadWolf not found in repo assets or ReplicatedStorage")
 	end
 
 	camera:bindMarkers(animator, CameraData)
